@@ -15,35 +15,28 @@ data "aws_caller_identity" "current" {}
 
 data "aws_region" "current" {}
 
-variable "key-name" {
-  default = "firstkey"   # change here
-}
-
-locals {
-  name = "nihat"   # change here, optional
-}
 
 resource "aws_instance" "master" {
   ami                  = "ami-08d4ac5b634553e16"
   instance_type        = "t3a.medium"
-  key_name             = var.key-name
+  key_name             = var.key
   iam_instance_profile = aws_iam_instance_profile.ec2connectprofile.name
   vpc_security_group_ids = [ aws_security_group.tf-k8s-master-sec-gr.id ]
   user_data            = data.template_file.master.rendered
   tags = {
-    Name = "${local.name}-kube-master"
+    Name = "${var.tags}-kube-master"
   }
 }
 
 resource "aws_instance" "worker" {
   ami                  = "ami-08d4ac5b634553e16"
   instance_type        = "t3a.medium"
-  key_name             = var.key-name
+  key_name             = var.key
   iam_instance_profile = aws_iam_instance_profile.ec2connectprofile.name
   vpc_security_group_ids = [ aws_security_group.tf-k8s-master-sec-gr.id ]
   user_data            = data.template_file.worker.rendered
   tags = {
-    Name = "${local.name}-kube-worker"
+    Name = "${var.tags}-kube-worker"
   }
   depends_on = [aws_instance.master]
 }
@@ -70,7 +63,7 @@ resource "aws_iam_role" "ec2connectcli" {
   })
 
   inline_policy {
-    name = "nihat_inline_policy"
+    name = "${var.tags}_inline_policy"
 
     policy = jsonencode({
       Version = "2012-10-17"
@@ -110,9 +103,9 @@ data "template_file" "master" {
 }
 
 resource "aws_security_group" "tf-k8s-master-sec-gr" {
-  name = "${local.name}-nht-master-sec-gr"
+  name = "${var.tags}-master-sec-gr"
   tags = {
-    Name = "${local.name}-nht-master-sec-gr"
+    Name = "${var.tags}-master-sec-gr"
   }
 
   ingress {
