@@ -2,9 +2,8 @@
 apt-get update -y
 apt-get upgrade -y
 apt install git -y
-TOKEN="***"
-git clone https://$TOKEN@github.com/Nihatcan17/phonebook-k8s.git
-cd phonebook-k8s
+git clone https://github.com/Nihatcan17/phonebook-kubernetes-project.git
+cd /home/ec2-user/phonebook-kubernetes-project/kubernetes-files
 mv *.yaml /home/ubuntu
 hostnamectl set-hostname kube-master
 chmod 777 /etc/sysctl.conf
